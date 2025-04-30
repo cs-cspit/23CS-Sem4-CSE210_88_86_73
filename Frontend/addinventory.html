@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shelf - Add Inventory</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-800);
+            padding-top: 80px;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(46, 125, 50, 0.1), rgba(46, 125, 50, 0.1)),
+                url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .navbar {
+            width: 100%;
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar .brand {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .brand::before {
+            content: '🌱';
+            margin-right: 10px;
+        }
+
+        .navbar .menu {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navbar .menu a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--gray-900);
+            font-weight: 700;
+            font-size: 32px;
+        }
+
+        .form-container {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--gray-700);
+            font-size: 15px;
+        }
+
+        .form-group .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 43px;
+            color: var(--gray-500);
+            font-size: 18px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px 12px 45px;
+            border: 2px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 16px;
+            transition: var(--transition);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+        }
+
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: var(--radius);
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .info-text {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-top: 5px;
+        }
+
+        .feedback {
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .feedback.success {
+            background-color: var(--success-light);
+            color: var(--success-dark);
+            border: 1px solid var(--success);
+        }
+
+        .feedback.error {
+            background-color: var(--danger-light);
+            color: var(--danger-dark);
+            border: 1px solid var(--danger);
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 25px;
+            }
+            
+            .page-title {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="retailer.html" class="brand">Smart Shelf</a>
+        <div class="menu">
+            <a href="retailer.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="inventory.html"><i class="fas fa-box"></i> Inventory</a>
+            <a href="surplus_m.html"><i class="fas fa-tags"></i> Surplus</a>
+            <a href="retailer-orders.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a href="addinventory.html" class="active"><i class="fas fa-plus-circle"></i> Add Product</a>
+            <a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">Add New Product</h1>
+        
+        <div id="feedback-msg" class="feedback"></div>
+        
+        <div class="form-container">
+            <form id="inventory-form">
+                <div class="form-group">
+                    <label for="product-name"><i class="fas fa-tag"></i> Product Name</label>
+                    <div class="input-group">
+                        <i class="fas fa-tag"></i>
+                        <input type="text" id="product-name" name="product_name" class="form-control" placeholder="Enter product name" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="category"><i class="fas fa-layer-group"></i> Category</label>
+                    <div class="input-group">
+                        <i class="fas fa-layer-group"></i>
+                        <select id="category" name="category" class="form-control" required>
+                            <option value="">Select category</option>
+                            <option value="Dairy">Dairy</option>
+                            <option value="Fruits">Fruits</option>
+                            <option value="Vegetables">Vegetables</option>
+                            <option value="Grains">Grains</option>
+                            <option value="Baked Goods">Baked Goods</option>
+                            <option value="Snacks">Snacks</option>
+                            <option value="Beverages">Beverages</option>
+                            <option value="Condiments">Condiments</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity"><i class="fas fa-cubes"></i> Quantity</label>
+                    <div class="input-group">
+                        <i class="fas fa-cubes"></i>
+                        <input type="number" id="quantity" name="quantity" class="form-control" placeholder="Enter quantity" min="1" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="unit-type"><i class="fas fa-weight-hanging"></i> Unit Type</label>
+                    <div class="input-group">
+                        <i class="fas fa-weight-hanging"></i>
+                        <input type="text" id="unit-type" name="unit_type" class="form-control" placeholder="e.g., Bottles, Pieces, Kg" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="expiry-date"><i class="fas fa-calendar-alt"></i> Expiry Date</label>
+                    <div class="input-group">
+                        <i class="fas fa-calendar-alt"></i>
+                        <input type="date" id="expiry-date" name="expiry_date" class="form-control" required>
+                    </div>
+                    <p class="info-text">Products nearing expiry will be automatically highlighted for surplus management</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="price"><i class="fas fa-rupee-sign"></i> Price/Unit (₹)</label>
+                    <div class="input-group">
+                        <i class="fas fa-rupee-sign"></i>
+                        <input type="number" step="0.01" id="price" name="price_per_unit" class="form-control" placeholder="Enter price per unit" min="0.01" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-plus-circle"></i> Add Product
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated and is a retailer
+            if (!protectPage(['retailer'])) {
+                return;
+            }
+            
+            // Set minimum expiry date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('expiry-date').min = today;
+            
+            // Add logout listener
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+            
+            // Form submission
+            const inventoryForm = document.getElementById('inventory-form');
+            const feedbackMsg = document.getElementById('feedback-msg');
+            
+            inventoryForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Get form data
+                const formData = {
+                    name: document.getElementById('product-name').value,
+                    category: document.getElementById('category').value,
+                    quantity: parseInt(document.getElementById('quantity').value),
+                    unitType: document.getElementById('unit-type').value,
+                    expiryDate: document.getElementById('expiry-date').value,
+                    price: parseFloat(document.getElementById('price').value)
+                };
+                
+                try {
+                    // Show loading state
+                    const submitBtn = inventoryForm.querySelector('button[type="submit"]');
+                    const originalBtnText = submitBtn.innerHTML;
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Product...';
+                    
+                    // Send data to API
+                    const response = await apiCall('/products/inventory', 'POST', formData);
+                    
+                    // Reset loading state
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnText;
+                    
+                    if (response && response.success) {
+                        // Show success message
+                        feedbackMsg.className = 'feedback success';
+                        feedbackMsg.innerHTML = '<i class="fas fa-check-circle"></i> Product added successfully!';
+                        feedbackMsg.style.display = 'block';
+                        
+                        // Reset form
+                        inventoryForm.reset();
+                        
+                        // Redirect to inventory page after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = 'inventory.html';
+                        }, 2000);
+                    } else {
+                        // Show error message
+                        feedbackMsg.className = 'feedback error';
+                        feedbackMsg.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${response.message || 'Failed to add product. Please try again.'}`;
+                        feedbackMsg.style.display = 'block';
+                    }
+                } catch (error) {
+                    console.error('Error adding product:', error);
+                    
+                    // Show error message
+                    feedbackMsg.className = 'feedback error';
+                    feedbackMsg.innerHTML = '<i class="fas fa-exclamation-circle"></i> An error occurred. Please try again.';
+                    feedbackMsg.style.display = 'block';
+                    
+                    // Reset button
+                    const submitBtn = inventoryForm.querySelector('button[type="submit"]');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Product';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

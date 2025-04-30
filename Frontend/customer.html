@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shelf - Customer Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-800);
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            width: 100%;
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar .brand {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .brand::before {
+            content: '🌱';
+            margin-right: 10px;
+        }
+
+        .navbar .menu {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navbar .menu a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar .menu a.sale-link {
+            background-image: linear-gradient(45deg, var(--secondary-light), var(--secondary));
+            color: white;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 15px rgba(255, 111, 0, 0.5);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 111, 0, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 111, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 111, 0, 0);
+            }
+        }
+
+        .hero {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1542838132-92c53300491e');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 5%;
+            text-align: center;
+            margin-top: -80px;
+            margin-bottom: 50px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+            animation: fadeInDown 1s ease 0.2s both;
+        }
+
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .btn-hero {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto 50px;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+            color: var(--primary-dark);
+        }
+
+        .section-title h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .section-title p {
+            font-size: 18px;
+            color: var(--gray-600);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .feature-card {
+            background-color: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .feature-content {
+            padding: 25px;
+            text-align: center;
+        }
+
+        .feature-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+
+        .feature-description {
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        .products-section {
+            margin-bottom: 80px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--warning);
+            color: var(--gray-900);
+            padding: 5px 10px;
+            border-radius: var(--radius);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .product-image {
+            height: 200px;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .product-content {
+            padding: 20px;
+        }
+
+        .product-category {
+            display: inline-block;
+            font-size: 12px;
+            text-transform: uppercase;
+            background-color: var(--primary-light);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--gray-900);
+        }
+
+        .product-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        .price-old {
+            text-decoration: line-through;
+            color: var(--gray-500);
+            font-size: 16px;
+            margin-right: 8px;
+        }
+
+        .product-action {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-product {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: var(--radius);
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sale-banner {
+            background-image: linear-gradient(to right, var(--secondary-dark), var(--secondary));
+            color: white;
+            padding: 60px 5%;
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .sale-banner h2 {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .sale-banner p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+
+        .btn-banner {
+            background-color: white;
+            color: var(--secondary-dark);
+            padding: 12px 25px;
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .btn-banner:hover {
+            background-color: var(--gray-100);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow);
+        }
+
+        .testimonials {
+            background-color: white;
+            padding: 80px 0;
+            margin-bottom: 80px;
+        }
+
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .testimonial-card {
+            background-color: var(--gray-50);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+        }
+
+        .testimonial-content {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--gray-700);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .testimonial-content::before {
+            content: '"';
+            font-size: 60px;
+            color: var(--primary-light);
+            opacity: 0.3;
+            position: absolute;
+            top: -30px;
+            left: -10px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .author-info h5 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--gray-900);
+        }
+
+        .author-info p {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        footer {
+            background-color: var(--gray-900);
+            color: white;
+            padding: 60px 0 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .footer-brand h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-brand p {
+            color: var(--gray-400);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .footer-links h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links a {
+            color: var(--gray-400);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 40px;
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 16px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .section-title h2 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="customer.html" class="brand">Smart Shelf</a>
+        <div class="menu">
+            <a href="customer.html" class="active"><i class="fas fa-home"></i> Home</a>
+            <a href="buy-products.html"><i class="fas fa-shopping-basket"></i> Products</a>
+            <a href="sale.html" class="sale-link"><i class="fas fa-tags"></i> SALE</a>
+            <a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart</a>
+            <a href="orders.html"><i class="fas fa-box"></i> Orders</a>
+            <a href="login-signup.html" id="login-link"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="#" id="logout-link" style="display: none;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <span id="user-info" style="display: none; color: white; padding: 10px 18px; align-items: center; gap: 8px;">
+                <i class="fas fa-user"></i> <span id="user-name"></span>
+            </span>
+        </div>
+    </div>
+
+    <section class="hero">
+        <h1>Fresh Products, Delivered to Your Door</h1>
+        <p>Browse our selection of high-quality products and enjoy fast delivery</p>
+        <div class="hero-buttons">
+            <a href="buy-products.html" class="btn-hero btn-primary"><i class="fas fa-shopping-basket"></i> Shop Now</a>
+            <a href="sale.html" class="btn-hero btn-secondary"><i class="fas fa-tags"></i> View Discounts</a>
+        </div>
+    </section>
+
+    <div class="container">
+        <div class="section-title">
+            <h2>Why Choose Smart Shelf?</h2>
+            <p>We provide the best quality products with amazing benefits</p>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon" style="color: var(--primary);">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <div class="feature-content">
+                    <h3 class="feature-title">Fresh Products</h3>
+                    <p class="feature-description">We source our products directly from farmers and suppliers to ensure the freshest quality.</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon" style="color: var(--secondary);">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="feature-content">
+                    <h3 class="feature-title">Fast Delivery</h3>
+                    <p class="feature-description">Get your groceries delivered to your doorstep within hours of ordering.</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon" style="color: var(--success);">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <div class="feature-content">
+                    <h3 class="feature-title">Amazing Discounts</h3>
+                    <p class="feature-description">Regular discounts and special offers to help you save on your grocery bills.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="products-section">
+            <div class="section-title">
+                <h2>Featured Products</h2>
+                <p>Check out our most popular items</p>
+            </div>
+
+            <div class="product-grid">
+                <div class="product-card">
+                    <img src="https://static.toiimg.com/photo/89752523.cms" alt="Organic Dairy" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Dairy</span>
+                        <h3 class="product-title">Organic Milk (1L)</h3>
+                        <div class="product-price">
+                            <span class="price">₹60</span>
+                            <div class="product-action">
+                                <a href="buy-products.html" class="btn-product btn-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="product-badge">Best Seller</span>
+                    <img src="https://images.unsplash.com/photo-1610832958506-aa56368176cf" alt="Fresh Vegetables" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Vegetables</span>
+                        <h3 class="product-title">Fresh Vegetable Basket</h3>
+                        <div class="product-price">
+                            <span class="price">₹250</span>
+                            <div class="product-action">
+                                <a href="buy-products.html" class="btn-product btn-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <img src="https://bakerpedia.com/wp-content/uploads/38752431_m.jpg" alt="Whole Wheat Bread" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Bakery</span>
+                        <h3 class="product-title">Whole Wheat Bread</h3>
+                        <div class="product-price">
+                            <span class="price">₹40</span>
+                            <div class="product-action">
+                                <a href="buy-products.html" class="btn-product btn-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card">
+                    <span class="product-badge">Near Expiry</span>
+                    <img src="https://images.unsplash.com/photo-1550989460-0adf9ea622e2" alt="Fresh Fruits" class="product-image">
+                    <div class="product-content">
+                        <span class="product-category">Fruits</span>
+                        <h3 class="product-title">Organic Apple Pack</h3>
+                        <div class="product-price">
+                            <div>
+                                <span class="price-old">₹180</span>
+                                <span class="price">₹150</span>
+                            </div>
+                            <div class="product-action">
+                                <a href="buy-products.html" class="btn-product btn-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="sale-banner">
+        <h2>Limited Time Offer!</h2>
+        <p>Shop our special discounted products before they run out.</p>
+        <a href="sale.html" class="btn-banner"><i class="fas fa-tags"></i> View Discounts</a>
+    </div>
+
+    <div class="container">
+        <div class="section-title">
+            <h2>What Our Customers Say</h2>
+            <p>Don't just take our word for it, hear from our satisfied customers</p>
+        </div>
+    </div>
+
+    <section class="testimonials">
+        <div class="container">
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        The quality of products is amazing! I've been ordering my groceries from Smart Shelf for months and have never been disappointed.
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Priya Sharma" class="author-avatar">
+                        <div class="author-info">
+                            <h5>Priya Sharma</h5>
+                            <p>Regular Customer</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        Fast delivery and excellent customer service. Their discounted products are a great way to save money while reducing food waste.
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/men/54.jpg" alt="Rahul Verma" class="author-avatar">
+                        <div class="author-info">
+                            <h5>Rahul Verma</h5>
+                            <p>Loyal Customer</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        I love how they offer discounts on products that are near expiry. It helps me save money and reduces food waste at the same time!
+                    </div>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Ananya Patel" class="author-avatar">
+                        <div class="author-info">
+                            <h5>Ananya Patel</h5>
+                            <p>Happy Customer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <h3><i class="fas fa-leaf"></i> Smart Shelf</h3>
+                <p>Smart Shelf is a modern inventory management system that helps reduce food waste by offering discounts on products nearing expiry.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <div class="footer-links">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="customer.html"><i class="fas fa-home"></i> Home</a></li>
+                    <li><a href="buy-products.html"><i class="fas fa-shopping-basket"></i> Products</a></li>
+                    <li><a href="sale.html"><i class="fas fa-tags"></i> Sale</a></li>
+                    <li><a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart</a></li>
+                    <li><a href="orders.html"><i class="fas fa-box"></i> My Orders</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Customer Service</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-question-circle"></i> FAQ</a></li>
+                    <li><a href="#"><i class="fas fa-truck"></i> Shipping Policy</a></li>
+                    <li><a href="#"><i class="fas fa-exchange-alt"></i> Return Policy</a></li>
+                    <li><a href="#"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+                    <li><a href="#"><i class="fas fa-phone"></i> Contact Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-links">
+                <h4>Contact Information</h4>
+                <ul>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> 123 Main Street, Mumbai, India</a></li>
+                    <li><a href="#"><i class="fas fa-envelope"></i> info@smartshelf.com</a></li>
+                    <li><a href="#"><i class="fas fa-phone-alt"></i> +91 1234567890</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2025 Smart Shelf. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated and has customer role
+            if (!protectPage(['customer'])) {
+                return;
+            }
+            
+            // Set user name in the navbar
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('user-name').textContent = userName;
+            }
+            
+            // Update navigation based on authentication
+            document.getElementById('login-link').style.display = 'none';
+            document.getElementById('logout-link').style.display = 'block';
+            document.getElementById('user-info').style.display = 'flex';
+            
+            // Add logout listener
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+            
+            // Load featured products
+            loadFeaturedProducts();
+            
+            // Load sale products
+            loadSaleProducts();
+        });
+    </script>
+</body>
+</html>

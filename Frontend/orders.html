@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shelf - My Orders</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-800);
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            width: 100%;
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar .brand {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .brand::before {
+            content: '🌱';
+            margin-right: 10px;
+        }
+
+        .navbar .menu {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navbar .menu a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar .menu a.sale-link {
+            background-image: linear-gradient(45deg, var(--secondary-light), var(--secondary));
+            color: white;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 15px rgba(255, 111, 0, 0.5);
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 111, 0, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 111, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 111, 0, 0);
+            }
+        }
+
+        .page-header {
+            text-align: center;
+            margin: 40px 0;
+            animation: fadeInDown 1s ease;
+        }
+
+        .page-header h1 {
+            font-size: 42px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary-dark);
+        }
+
+        .page-header p {
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            padding: 30px;
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            animation: fadeInUp 1s ease;
+        }
+
+        .empty-orders {
+            text-align: center;
+            padding: 60px 0;
+        }
+
+        .empty-orders i {
+            font-size: 80px;
+            color: var(--gray-300);
+            margin-bottom: 20px;
+        }
+
+        .empty-orders h2 {
+            font-size: 28px;
+            color: var(--gray-600);
+            margin-bottom: 20px;
+        }
+
+        .empty-orders p {
+            color: var(--gray-500);
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        .empty-orders .btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .empty-orders .btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .order-item {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            margin-bottom: 30px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .order-item:hover {
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .order-id {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .order-date {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .order-status {
+            padding: 12px 20px;
+            background-color: var(--gray-50);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .status-pending {
+            background-color: var(--warning);
+            color: var(--gray-900);
+        }
+
+        .status-processing {
+            background-color: var(--info);
+            color: white;
+        }
+
+        .status-delivered {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .order-total {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .order-products {
+            padding: 20px;
+        }
+
+        .product-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .product-card {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: var(--gray-50);
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .product-card:hover {
+            background-color: var(--gray-100);
+        }
+
+        .product-image {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius-sm);
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .product-details {
+            flex: 1;
+        }
+
+        .product-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--gray-900);
+        }
+
+        .product-info {
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        .order-actions {
+            padding: 15px 20px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-order {
+            padding: 8px 16px;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-dark);
+        }
+
+        .tracking-info {
+            padding: 20px;
+            background-color: var(--gray-50);
+            border-top: 1px solid var(--gray-200);
+            display: none;
+        }
+
+        .tracking-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 20px 30px;
+        }
+
+        .tracking-steps::before {
+            content: '';
+            position: absolute;
+            top: 15px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--gray-300);
+            z-index: 1;
+        }
+
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 80px;
+        }
+
+        .step-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--gray-300);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            color: white;
+        }
+
+        .step.active .step-icon {
+            background-color: var(--primary);
+        }
+
+        .step.completed .step-icon {
+            background-color: var(--success);
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: var(--gray-600);
+        }
+
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .step.completed .step-label {
+            color: var(--success);
+            font-weight: 600;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 32px;
+            }
+            
+            .container {
+                padding: 20px;
+                margin: 20px;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .order-status {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .product-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .tracking-steps {
+                flex-direction: column;
+                gap: 20px;
+                margin: 0;
+            }
+            
+            .tracking-steps::before {
+                width: 2px;
+                height: 100%;
+                left: 15px;
+                top: 0;
+            }
+            
+            .step {
+                display: flex;
+                align-items: center;
+                width: 100%;
+                text-align: left;
+                margin-left: 15px;
+            }
+            
+            .step-icon {
+                margin: 0 15px 0 0;
+            }
+        }
+
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--gray-200);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-container {
+            background-color: rgba(255, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: var(--radius);
+            color: var(--danger);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="customer.html" class="brand">Smart Shelf</a>
+        <div class="menu">
+            <a href="customer.html"><i class="fas fa-home"></i> Home</a>
+            <a href="buy-products.html"><i class="fas fa-shopping-basket"></i> Products</a>
+            <a href="sale.html" class="sale-link"><i class="fas fa-tags"></i> SALE</a>
+            <a href="cart.html"><i class="fas fa-shopping-cart"></i> Cart</a>
+            <a href="orders.html" class="active"><i class="fas fa-box"></i> Orders</a>
+            <a href="login-signup.html" id="login-link"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="#" id="logout-link" style="display: none;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <span id="user-info" style="display: none; color: white; padding: 10px 18px; align-items: center; gap: 8px;">
+                <i class="fas fa-user"></i> <span id="user-name"></span>
+            </span>
+        </div>
+    </div>
+
+    <div class="page-header">
+        <h1>My Orders</h1>
+        <p>Track and manage your orders</p>
+    </div>
+
+    <div class="container">
+        <div id="empty-orders-msg" class="empty-orders" style="display: none;">
+            <i class="fas fa-box-open"></i>
+            <h2>No orders yet</h2>
+            <p>You haven't placed any orders yet</p>
+            <a href="buy-products.html" class="btn"><i class="fas fa-shopping-basket"></i> Start Shopping</a>
+        </div>
+
+        <div id="orders-container">
+            <!-- Orders will be dynamically loaded here -->
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated
+            if (!localStorage.getItem('auth_token')) {
+                window.location.href = 'login-signup.html';
+                return;
+            }
+            
+            // Update navigation based on authentication
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('login-link').style.display = 'none';
+                document.getElementById('logout-link').style.display = 'block';
+                document.getElementById('user-name').textContent = userName;
+                document.getElementById('user-info').style.display = 'flex';
+            }
+            
+            // Add logout listener
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+            
+            // Load orders
+            loadOrders();
+        });
+        
+        async function loadOrders() {
+            const ordersContainer = document.getElementById('orders-container');
+            const emptyOrdersMsg = document.getElementById('empty-orders-msg');
+            
+            // Show loading indicator
+            ordersContainer.innerHTML = `
+                <div class="loading-spinner" style="text-align: center; padding: 50px;">
+                    <div class="spinner" style="margin: 0 auto;"></div>
+                    <p style="margin-top: 20px;">Loading your orders...</p>
+                </div>
+            `;
+            
+            try {
+                // Get the correct token
+                const token = localStorage.getItem('auth_token');
+                
+                if (!token) {
+                    throw new Error('Authentication token not found. Please log in again.');
+                }
+                
+                // Fetch orders from backend API
+                const response = await fetch('http://localhost:5000/api/orders/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to load orders (Status: ${response.status})`);
+                }
+                
+                const result = await response.json();
+                const orders = result.data || [];
+                
+                if (orders.length === 0) {
+                    emptyOrdersMsg.style.display = 'block';
+                    ordersContainer.innerHTML = '';
+                    return;
+                }
+                
+                emptyOrdersMsg.style.display = 'none';
+                
+                // Sort orders by date (newest first)
+                orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                // Generate HTML for each order
+                ordersContainer.innerHTML = orders.map((order, index) => {
+                    const orderDate = new Date(order.createdAt);
+                    const formattedDate = orderDate.toLocaleDateString('en-US', { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    const statusClass = getStatusClass(order.status);
+                    
+                    return `
+                    <div class="order-item">
+                        <div class="order-header">
+                            <div class="order-id">Order #${order._id}</div>
+                            <div class="order-date">${formattedDate}</div>
+                        </div>
+                        
+                        <div class="order-status">
+                            <span class="status-badge ${statusClass}">${capitalizeFirstLetter(order.status)}</span>
+                            <span class="order-total">Total: ₹${order.totalPrice.toFixed(2)}</span>
+                        </div>
+                        
+                        <div class="order-products">
+                            <div class="product-list">
+                                ${order.orderItems.map(item => `
+                                    <div class="product-card">
+                                        <img src="${item.image || `https://via.placeholder.com/60x60?text=${encodeURIComponent(item.name)}`}" 
+                                            alt="${item.name}" class="product-image">
+                                        <div class="product-details">
+                                            <div class="product-name">${item.name}</div>
+                                            <div class="product-info">
+                                                <span>${item.quantity} × ₹${item.price.toFixed(2)}</span>
+                                                <span>₹${(item.quantity * item.price).toFixed(2)}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="order-actions">
+                            <button class="btn-order btn-outline" onclick="toggleTracking('${order._id}')">
+                                <i class="fas fa-truck"></i> Track Order
+                            </button>
+                            ${order.status === 'pending' ? `
+                                <button class="btn-order btn-danger" onclick="cancelOrder('${order._id}')">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            ` : ''}
+                            <button class="btn-order btn-primary" onclick="reorderItems('${order._id}')">
+                                <i class="fas fa-redo"></i> Reorder
+                            </button>
+                        </div>
+                        
+                        <div id="tracking-info-${order._id}" class="tracking-info" style="display: none;">
+                            <h3><i class="fas fa-truck"></i> Tracking Information</h3>
+                            <div class="tracking-steps">
+                                <div class="step completed">
+                                    <div class="step-icon"><i class="fas fa-check"></i></div>
+                                    <div class="step-label">Order Placed</div>
+                                </div>
+                                <div class="step ${order.status !== 'pending' ? 'completed' : ''}">
+                                    <div class="step-icon"><i class="fas fa-check"></i></div>
+                                    <div class="step-label">Processing</div>
+                                </div>
+                                <div class="step ${order.status === 'shipped' || order.status === 'delivered' ? 'completed' : order.status === 'processing' ? 'active' : ''}">
+                                    <div class="step-icon"><i class="fas fa-truck"></i></div>
+                                    <div class="step-label">Shipped</div>
+                                </div>
+                                <div class="step ${order.status === 'delivered' ? 'completed' : order.status === 'shipped' ? 'active' : ''}">
+                                    <div class="step-icon"><i class="fas fa-home"></i></div>
+                                    <div class="step-label">Delivered</div>
+                                </div>
+                            </div>
+                            ${order.status === 'shipped' ? `
+                                <div style="text-align: center; margin-top: 20px;">
+                                    <p>Estimated delivery: ${getEstimatedDelivery(order.createdAt)}</p>
+                                    <p>Tracking Number: <strong>${order._id}</strong></p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+                
+                // Add event listeners to show/hide tracking info
+                orders.forEach(order => {
+                    const trackingInfo = document.getElementById(`tracking-info-${order._id}`);
+                    if (trackingInfo) {
+                        trackingInfo.style.display = 'none';
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                ordersContainer.innerHTML = `
+                    <div class="error-container" style="text-align: center; padding: 30px;">
+                        <p><i class="fas fa-exclamation-circle"></i> Failed to load orders: ${error.message}</p>
+                        <button class="btn-order btn-primary" onclick="loadOrders()">Try Again</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function toggleTracking(orderId) {
+            const trackingInfo = document.getElementById(`tracking-info-${orderId}`);
+            if (trackingInfo) {
+                trackingInfo.style.display = trackingInfo.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        
+        async function cancelOrder(orderId) {
+            if (!confirm('Are you sure you want to cancel this order?')) {
+                return;
+            }
+            
+            try {
+                // Get the correct token
+                const token = localStorage.getItem('auth_token');
+                
+                if (!token) {
+                    throw new Error('Authentication token not found. Please log in again.');
+                }
+                
+                const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ status: 'cancelled' })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to cancel order (Status: ${response.status})`);
+                }
+                
+                // Reload orders
+                loadOrders();
+                
+            } catch (error) {
+                console.error('Error cancelling order:', error);
+                alert(`Failed to cancel order: ${error.message}`);
+            }
+        }
+        
+        async function reorderItems(orderId) {
+            try {
+                // Get the correct token
+                const token = localStorage.getItem('auth_token');
+                
+                if (!token) {
+                    throw new Error('Authentication token not found. Please log in again.');
+                }
+                
+                // Get order details
+                const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to get order details (Status: ${response.status})`);
+                }
+                
+                const result = await response.json();
+                const order = result.data;
+                
+                if (!order) {
+                    throw new Error('Order not found');
+                }
+                
+                // Create a cart with the order items
+                const cart = order.orderItems.map(item => ({
+                    productId: item.product,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    category: item.category || 'Product',
+                    image: item.image || `https://via.placeholder.com/120x120?text=${encodeURIComponent(item.name)}`
+                }));
+                
+                // Save to localStorage
+                localStorage.setItem('cart', JSON.stringify(cart));
+                
+                // Redirect to cart page
+                alert('Items added to cart');
+                window.location.href = 'cart.html';
+                
+            } catch (error) {
+                console.error('Error reordering items:', error);
+                alert(`Failed to reorder items: ${error.message}`);
+            }
+        }
+        
+        function getStatusClass(status) {
+            switch(status) {
+                case 'pending':
+                    return 'status-pending';
+                case 'processing':
+                    return 'status-processing';
+                case 'shipped':
+                    return 'status-shipped';
+                case 'delivered':
+                    return 'status-delivered';
+                case 'cancelled':
+                    return 'status-cancelled';
+                default:
+                    return 'status-pending';
+            }
+        }
+        
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+        
+        function getEstimatedDelivery(orderDate) {
+            const date = new Date(orderDate);
+            date.setDate(date.getDate() + 3); // Add 3 days for delivery
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+            });
+        }
+    </script>
+</body>
+</html> 

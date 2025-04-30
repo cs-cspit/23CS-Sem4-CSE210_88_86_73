@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shelf - Inventory Management</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="retailer.html" class="brand">Smart Shelf</a>
+        <div class="menu">
+            <a href="retailer.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="inventory.html" class="active"><i class="fas fa-boxes"></i> Inventory</a>
+            <a href="surplus_m.html"><i class="fas fa-leaf"></i> Surplus Management</a>
+            <a href="addinventory.html"><i class="fas fa-plus-circle"></i> Add Product</a>
+            <a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        </div>
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <span>Welcome, <span class="user-name" id="user-name">Retailer</span></span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">Inventory Management</h1>
+        
+        <div class="dashboard-widgets">
+            <div class="widget">
+                <div class="widget-icon"><i class="fas fa-box"></i></div>
+                <div class="widget-title">Total Products</div>
+                <div class="widget-value" id="total-products">0</div>
+            </div>
+            <div class="widget">
+                <div class="widget-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="widget-title">Near Expiry</div>
+                <div class="widget-value" id="near-expiry-count">0</div>
+            </div>
+            <div class="widget">
+                <div class="widget-icon"><i class="fas fa-clock"></i></div>
+                <div class="widget-title">Expired</div>
+                <div class="widget-value" id="expired-count">0</div>
+            </div>
+            <div class="widget">
+                <div class="widget-icon"><i class="fas fa-tags"></i></div>
+                <div class="widget-title">Discounted</div>
+                <div class="widget-value" id="discounted-count">0</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <span>Products List</span>
+                <button class="btn" onclick="location.href='addinventory.html'">
+                    <i class="fas fa-plus"></i> Add New Product
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="search-filters">
+                    <div class="form-group">
+                        <div class="input-icon">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="search-input" placeholder="Search products...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <select id="category-filter">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <select id="status-filter">
+                            <option value="">All Status</option>
+                            <option value="fresh">Fresh</option>
+                            <option value="near_expiry">Near Expiry</option>
+                            <option value="expired">Expired</option>
+                            <option value="discounted">Discounted</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="inventory-content">
+                    <div class="loading-spinner" id="loading-spinner">
+                        <div class="spinner"></div>
+                        <p>Loading inventory data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Update Modal -->
+    <div id="update-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Update Product</h2>
+            <form id="update-product-form">
+                <input type="hidden" id="product-id">
+                
+                <div class="form-group">
+                    <label for="product-name"><i class="fas fa-tag"></i> Product Name</label>
+                    <input type="text" id="product-name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-description"><i class="fas fa-align-left"></i> Description</label>
+                    <textarea id="product-description" rows="3" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-category"><i class="fas fa-folder"></i> Category</label>
+                    <input type="text" id="product-category" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-price"><i class="fas fa-rupee-sign"></i> Price (₹)</label>
+                    <input type="number" id="product-price" min="0" step="0.01" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-quantity"><i class="fas fa-cubes"></i> Quantity</label>
+                    <input type="number" id="product-quantity" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="product-expiry"><i class="fas fa-calendar-alt"></i> Expiry Date</label>
+                    <input type="date" id="product-expiry" required>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn"><i class="fas fa-save"></i> Update Product</button>
+                    <button type="button" class="btn btn-danger" id="delete-product-btn"><i class="fas fa-trash"></i> Delete Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-confirm-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="delete-modal-close">&times;</span>
+            <h2><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h2>
+            <p>Are you sure you want to delete this product? This action cannot be undone.</p>
+            <div class="form-actions">
+                <button class="btn btn-danger" id="confirm-delete-btn"><i class="fas fa-trash"></i> Delete</button>
+                <button class="btn" id="cancel-delete-btn"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Add styles for input icon
+        const additionalStyles = document.createElement('style');
+        additionalStyles.textContent = `
+            .input-icon {
+                position: relative;
+            }
+            
+            .input-icon i {
+                position: absolute;
+                left: 15px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--gray-500);
+            }
+            
+            .input-icon input {
+                padding-left: 45px;
+            }
+        `;
+        document.head.appendChild(additionalStyles);
+        
+        // Protect page - only retailers can access
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated and is a retailer
+            if (!protectPage(['retailer'])) {
+                return;
+            }
+            
+            // Set user name
+            const user = getCurrentUser();
+            document.getElementById('user-name').textContent = user.name;
+            
+            // Add logout listener
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+            
+            // Get filter elements
+            const searchInput = document.getElementById('search-input');
+            const categoryFilter = document.getElementById('category-filter');
+            const statusFilter = document.getElementById('status-filter');
+            
+            // Add event listeners
+            searchInput.addEventListener('input', filterInventory);
+            categoryFilter.addEventListener('change', filterInventory);
+            statusFilter.addEventListener('change', filterInventory);
+            
+            // Delete confirmation modal setup
+            const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+            const deleteProductBtn = document.getElementById('delete-product-btn');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            const deleteModalClose = document.getElementById('delete-modal-close');
+            
+            deleteProductBtn.addEventListener('click', function() {
+                deleteConfirmModal.style.display = 'block';
+            });
+            
+            cancelDeleteBtn.addEventListener('click', function() {
+                deleteConfirmModal.style.display = 'none';
+            });
+            
+            deleteModalClose.addEventListener('click', function() {
+                deleteConfirmModal.style.display = 'none';
+            });
+            
+            confirmDeleteBtn.addEventListener('click', async function() {
+                const productId = document.getElementById('product-id').value;
+                await deleteProduct(productId);
+                deleteConfirmModal.style.display = 'none';
+            });
+            
+            // Load inventory data
+            loadInventory();
+        });
+        
+        let allProducts = []; // Store all products for filtering
+        
+        async function loadInventory() {
+            const inventoryContent = document.getElementById('inventory-content');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            loadingSpinner.style.display = 'flex';
+            
+            try {
+                // Get retailer's inventory from the API
+                const response = await apiCall('/inventory');
+                
+                if (!response || !response.success) {
+                    throw new Error('Failed to load inventory data');
+                }
+                
+                allProducts = response.data || [];
+                
+                // Update widget counts
+                document.getElementById('total-products').textContent = allProducts.length;
+                
+                const nearExpiryCount = allProducts.filter(p => getProductStatus(p) === 'near_expiry').length;
+                document.getElementById('near-expiry-count').textContent = nearExpiryCount;
+                
+                const expiredCount = allProducts.filter(p => getProductStatus(p) === 'expired').length;
+                document.getElementById('expired-count').textContent = expiredCount;
+                
+                const discountedCount = allProducts.filter(p => p.discount && p.discount > 0).length;
+                document.getElementById('discounted-count').textContent = discountedCount;
+                
+                // Populate category filter
+                const categories = [...new Set(allProducts.map(p => p.category))];
+                const categoryFilter = document.getElementById('category-filter');
+                categoryFilter.innerHTML = '<option value="">All Categories</option>';
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = category;
+                    categoryFilter.appendChild(option);
+                });
+                
+                loadingSpinner.style.display = 'none';
+                renderInventory(allProducts);
+            } catch (error) {
+                console.error('Inventory loading error:', error);
+                loadingSpinner.style.display = 'none';
+                inventoryContent.innerHTML = `
+                    <div class="error-container">
+                        <p><i class="fas fa-exclamation-circle"></i> Failed to load inventory data.</p>
+                        <button class="btn" onclick="loadInventory()"><i class="fas fa-sync"></i> Reload</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function filterInventory() {
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            const status = document.getElementById('status-filter').value;
+            
+            // Filter products based on search text, category and status
+            const filteredProducts = allProducts.filter(product => {
+                const matchesSearch = !searchText || 
+                    product.name.toLowerCase().includes(searchText) || 
+                    product.description.toLowerCase().includes(searchText);
+                
+                const matchesCategory = !category || product.category === category;
+                
+                let matchesStatus = true;
+                if (status) {
+                    if (status === 'discounted') {
+                        matchesStatus = product.discount && product.discount > 0;
+                    } else {
+                        const productStatus = getProductStatus(product);
+                        matchesStatus = productStatus === status;
+                    }
+                }
+                
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+            
+            renderInventory(filteredProducts);
+        }
+        
+        function renderInventory(products) {
+            const inventoryContent = document.getElementById('inventory-content');
+            
+            if (products.length === 0) {
+                inventoryContent.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-search"></i>
+                        <p>No products found matching your criteria.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Create table
+            let tableHTML = `
+                <div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                <th>Category</th>
+                                <th>Price (₹)</th>
+                <th>Quantity</th>
+                <th>Expiry Date</th>
+                <th>Status</th>
+                                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            `;
+            
+            products.forEach(product => {
+                const status = getProductStatus(product);
+                const statusClass = `status-${status.replace('_', '-')}`;
+                const statusLabel = status === 'fresh' ? 'Fresh' : 
+                                   status === 'near_expiry' ? 'Near Expiry' : 'Expired';
+                
+                const isDiscounted = product.discount && product.discount > 0;
+                const discountText = isDiscounted ? 
+                    `<span class="discount-tag"><i class="fas fa-tag"></i> -${product.discount}%</span>` : '';
+                
+                const originalPrice = product.price.toFixed(2);
+                const discountedPrice = isDiscounted ? 
+                    (product.price * (1 - product.discount / 100)).toFixed(2) : originalPrice;
+                
+                const priceDisplay = isDiscounted ? 
+                    `<span class="original-price">₹${originalPrice}</span> ₹${discountedPrice}` : 
+                    `₹${originalPrice}`;
+                
+                const expiryDate = new Date(product.expiry_date).toLocaleDateString();
+                const daysToExpiry = Math.ceil((new Date(product.expiry_date) - new Date()) / (1000 * 60 * 60 * 24));
+                
+                const expiryInfo = status === 'expired' ? 
+                    `<span class="expiry-info expired"><i class="fas fa-calendar-times"></i> Expired ${Math.abs(daysToExpiry)} days ago</span>` : 
+                    status === 'near_expiry' ? 
+                    `<span class="expiry-info near-expiry"><i class="fas fa-calendar-day"></i> Expires in ${daysToExpiry} days</span>` : 
+                    `<span class="expiry-info"><i class="fas fa-calendar"></i> ${expiryDate}</span>`;
+                
+                tableHTML += `
+                    <tr data-id="${product._id}">
+                        <td>${product._id.substr(-6)}</td>
+                        <td>${product.name}</td>
+                        <td>${product.category}</td>
+                        <td>${priceDisplay} ${discountText}</td>
+                        <td>${product.quantity}</td>
+                        <td>${expiryInfo}</td>
+                        <td><span class="status ${statusClass}">${statusLabel}</span></td>
+                        <td>
+                            <button class="btn edit-btn" data-id="${product._id}">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </td>
+            </tr>
+                `;
+            });
+            
+            tableHTML += `
+        </tbody>
+    </table>
+                </div>
+            `;
+            
+            inventoryContent.innerHTML = tableHTML;
+            
+            // Add event listeners to edit buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', () => openUpdateModal(btn.dataset.id));
+            });
+        }
+        
+        function getProductStatus(product) {
+            const today = new Date();
+            const expiryDate = new Date(product.expiry_date);
+            const daysToExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysToExpiry <= 0) {
+                return 'expired';
+            } else if (daysToExpiry <= 10) {
+                return 'near_expiry';
+            } else {
+                return 'fresh';
+            }
+        }
+        
+        function openUpdateModal(productId) {
+            const product = allProducts.find(p => p._id === productId);
+            if (!product) return;
+            
+            // Set form values
+            document.getElementById('product-id').value = product._id;
+            document.getElementById('product-name').value = product.name;
+            document.getElementById('product-description').value = product.description;
+            document.getElementById('product-category').value = product.category;
+            document.getElementById('product-price').value = product.price;
+            document.getElementById('product-quantity').value = product.quantity;
+            
+            // Format date for input
+            const expiryDate = new Date(product.expiry_date);
+            const year = expiryDate.getFullYear();
+            const month = String(expiryDate.getMonth() + 1).padStart(2, '0');
+            const day = String(expiryDate.getDate()).padStart(2, '0');
+            document.getElementById('product-expiry').value = `${year}-${month}-${day}`;
+            
+            // Show modal
+            document.getElementById('update-modal').style.display = 'block';
+            
+            // Add close event
+            document.querySelector('.close').addEventListener('click', () => {
+                document.getElementById('update-modal').style.display = 'none';
+            });
+            
+            // Add form submit event
+            document.getElementById('update-product-form').addEventListener('submit', updateProduct);
+        }
+        
+        async function updateProduct(e) {
+            e.preventDefault();
+            
+            const productData = {
+                _id: document.getElementById('product-id').value,
+                name: document.getElementById('product-name').value,
+                description: document.getElementById('product-description').value,
+                category: document.getElementById('product-category').value,
+                price: parseFloat(document.getElementById('product-price').value),
+                quantity: parseInt(document.getElementById('product-quantity').value),
+                expiry_date: document.getElementById('product-expiry').value
+            };
+            
+            try {
+                const response = await apiCall('/update-product', 'POST', productData);
+                
+                if (!response || !response.success) {
+                    throw new Error(response.message || 'Failed to update product');
+                }
+                
+                // Close modal
+                document.getElementById('update-modal').style.display = 'none';
+                
+                // Show success message and reload inventory
+                const inventoryContent = document.getElementById('inventory-content');
+                inventoryContent.innerHTML = `
+                    <div class="success-message">
+                        <i class="fas fa-check-circle"></i> Product updated successfully!
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    loadInventory();
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Update error:', error);
+                alert('Failed to update product: ' + error.message);
+            }
+        }
+        
+        async function deleteProduct(productId) {
+            try {
+                const response = await apiCall('/delete-product', 'POST', { _id: productId });
+                
+                if (!response || !response.success) {
+                    throw new Error(response.message || 'Failed to delete product');
+                }
+                
+                // Close modal
+                document.getElementById('update-modal').style.display = 'none';
+                
+                // Show success message and reload inventory
+                const inventoryContent = document.getElementById('inventory-content');
+                inventoryContent.innerHTML = `
+                    <div class="success-message">
+                        <i class="fas fa-check-circle"></i> Product deleted successfully!
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    loadInventory();
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Delete error:', error);
+                alert('Failed to delete product: ' + error.message);
+            }
+        }
+
+        // Add this style for the new elements
+        const moreStyles = document.createElement('style');
+        moreStyles.textContent = `
+            .no-data-message {
+                text-align: center;
+                padding: 30px;
+                color: var(--gray-600);
+            }
+            
+            .no-data-message i {
+                font-size: 48px;
+                margin-bottom: 15px;
+                color: var(--gray-400);
+            }
+            
+            .discount-tag {
+                background-color: var(--secondary);
+                color: white;
+                padding: 3px 8px;
+                border-radius: 12px;
+                font-size: 12px;
+                margin-left: 5px;
+                white-space: nowrap;
+            }
+            
+            .expiry-info {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+            
+            .expiry-info.expired {
+                color: var(--danger);
+            }
+            
+            .expiry-info.near-expiry {
+                color: var(--warning);
+            }
+            
+            .edit-btn {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+        `;
+        document.head.appendChild(moreStyles);
+    </script>
+</body>
+</html>

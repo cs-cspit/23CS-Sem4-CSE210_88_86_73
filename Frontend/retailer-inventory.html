@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shelf - Retailer Inventory</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-800);
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            width: 100%;
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar .brand {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .brand::before {
+            content: '🌱';
+            margin-right: 10px;
+        }
+
+        .navbar .menu {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navbar .menu a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            padding: 30px;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        th {
+            font-weight: 600;
+            color: var(--gray-700);
+            background-color: var(--gray-50);
+        }
+
+        tr:hover {
+            background-color: var(--gray-50);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-fresh {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+
+        .status-near-expiry {
+            background-color: var(--warning-light);
+            color: var(--warning);
+        }
+
+        .status-expired {
+            background-color: var(--danger-light);
+            color: var(--danger);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--gray-100);
+            color: var(--gray-600);
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .action-btn:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius);
+            font-size: 16px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.2);
+            outline: none;
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 300px;
+        }
+
+        .search-box input {
+            padding-left: 45px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-500);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            background-color: white;
+            border: 1px solid var(--gray-200);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .page-btn:hover {
+            background-color: var(--gray-100);
+        }
+
+        .page-btn.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 600px;
+            box-shadow: var(--shadow-lg);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: var(--gray-500);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 20px;
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="retailer.html" class="brand">Smart Shelf</a>
+        <div class="menu">
+            <a href="retailer.html"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="retailer-inventory.html" class="active"><i class="fas fa-box"></i> Inventory</a>
+            <a href="retailer-orders.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a href="retailer-products.html"><i class="fas fa-tags"></i> Products</a>
+            <a href="login-signup.html" id="login-link"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="#" id="logout-link" style="display: none;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <span id="user-info" style="display: none; color: white; padding: 10px 18px; align-items: center; gap: 8px;">
+                <i class="fas fa-user"></i> <span id="user-name"></span>
+            </span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title"><i class="fas fa-box"></i> Inventory Management</h1>
+
+        <div class="card">
+            <div class="card-header">
+                <div>Inventory Overview</div>
+                <button class="btn btn-primary" onclick="openAddProductModal()">
+                    <i class="fas fa-plus"></i> Add New Product
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="filters">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Search products..." onkeyup="filterInventory()">
+                    </div>
+                    <div class="filter-item">
+                        <label for="category-filter">Category:</label>
+                        <select id="category-filter" onchange="filterInventory()">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label for="status-filter">Status:</label>
+                        <select id="status-filter" onchange="filterInventory()">
+                            <option value="">All Status</option>
+                            <option value="fresh">Fresh</option>
+                            <option value="near_expiry">Near Expiry</option>
+                            <option value="expired">Expired</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inventory-body">
+                            <tr>
+                                <td colspan="7" style="text-align: center;">
+                                    <div class="loading-spinner">
+                                        <div class="spinner"></div>
+                                        <p>Loading inventory...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="pagination">
+                    <!-- Pagination will be added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Product Modal -->
+    <div class="modal" id="product-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Add New Product</h2>
+                <button class="modal-close" onclick="closeProductModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="product-form">
+                    <input type="hidden" id="product-id">
+                    <div class="form-group">
+                        <label for="product-name">Product Name</label>
+                        <input type="text" id="product-name" required>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-category">Category</label>
+                            <select id="product-category" required>
+                                <option value="">Select Category</option>
+                                <option value="Dairy">Dairy</option>
+                                <option value="Bakery">Bakery</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Meat">Meat</option>
+                                <option value="Beverages">Beverages</option>
+                                <option value="Snacks">Snacks</option>
+                                <option value="Grocery">Grocery</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-price">Price</label>
+                            <input type="number" id="product-price" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="product-quantity">Quantity</label>
+                            <input type="number" id="product-quantity" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="product-expiry">Expiry Date</label>
+                            <input type="date" id="product-expiry" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-description">Description</label>
+                        <textarea id="product-description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeProductModal()">Cancel</button>
+                <button class="btn btn-primary" id="save-product-btn" onclick="saveProduct()">Save Product</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="delete-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Confirm Deletion</h2>
+                <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this product? This action cannot be undone.</p>
+                <p id="delete-product-name" style="font-weight: bold;"></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-primary" style="background-color: var(--danger);" onclick="confirmDelete()">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Global variables
+        let allProducts = [];
+        let currentPage = 1;
+        let productsPerPage = 10;
+        let deleteProductId = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated and has retailer role
+            if (!protectPage(['retailer'])) {
+                return;
+            }
+            
+            // Set user name in the navbar
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('user-name').textContent = userName;
+            }
+            
+            // Update navigation based on authentication
+            document.getElementById('login-link').style.display = 'none';
+            document.getElementById('logout-link').style.display = 'block';
+            document.getElementById('user-info').style.display = 'flex';
+            
+            // Add logout listener
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+            
+            // Load inventory
+            loadInventory();
+        });
+
+        async function loadInventory() {
+            try {
+                const response = await apiCall('/products/inventory/me');
+                
+                if (!response || !response.success) {
+                    throw new Error('Failed to load inventory');
+                }
+                
+                allProducts = response.data || [];
+                
+                // Populate category filter
+                populateCategoryFilter();
+                
+                // Render products
+                renderInventory();
+                
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+                document.getElementById('inventory-body').innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center;">
+                            <div class="error-container">
+                                <p><i class="fas fa-exclamation-circle"></i> Failed to load inventory.</p>
+                                <button class="btn" onclick="loadInventory()"><i class="fas fa-sync"></i> Try Again</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        function populateCategoryFilter() {
+            const categories = [...new Set(allProducts.map(p => p.category))];
+            const categoryFilter = document.getElementById('category-filter');
+            
+            // Clear existing options except first one
+            while (categoryFilter.options.length > 1) {
+                categoryFilter.remove(1);
+            }
+            
+            // Add new options
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+        }
+
+        function filterInventory() {
+            const searchText = document.getElementById('search-input').value.toLowerCase();
+            const category = document.getElementById('category-filter').value;
+            const status = document.getElementById('status-filter').value;
+            
+            const filteredProducts = allProducts.filter(product => {
+                const matchesSearch = !searchText || 
+                    product.name.toLowerCase().includes(searchText) || 
+                    (product.description && product.description.toLowerCase().includes(searchText));
+                
+                const matchesCategory = !category || product.category === category;
+                
+                const matchesStatus = !status || product.status === status;
+                
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+            
+            // Reset to first page when filtering
+            currentPage = 1;
+            
+            // Render filtered products
+            renderInventory(filteredProducts);
+        }
+
+        function renderInventory(products = allProducts) {
+            const inventoryBody = document.getElementById('inventory-body');
+            
+            if (products.length === 0) {
+                inventoryBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center;">No products found</td>
+                    </tr>
+                `;
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+            
+            // Calculate pagination
+            const totalPages = Math.ceil(products.length / productsPerPage);
+            const startIndex = (currentPage - 1) * productsPerPage;
+            const endIndex = Math.min(startIndex + productsPerPage, products.length);
+            const currentProducts = products.slice(startIndex, endIndex);
+            
+            // Render products
+            let html = '';
+            currentProducts.forEach(product => {
+                const statusClass = product.status === 'fresh' ? 'status-fresh' : 
+                                   product.status === 'near_expiry' ? 'status-near-expiry' : 
+                                   'status-expired';
+                
+                html += `
+                <tr>
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
+                    <td>${formatCurrency(product.price)}</td>
+                    <td>${product.quantity}</td>
+                    <td>${formatDate(product.expiryDate)}</td>
+                    <td><span class="status ${statusClass}">${product.status.replace('_', ' ')}</span></td>
+                    <td class="actions">
+                        <button class="action-btn" title="Edit" onclick="editProduct('${product._id}')">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn" title="Delete" onclick="deleteProduct('${product._id}', '${product.name}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                `;
+            });
+            
+            inventoryBody.innerHTML = html;
+            
+            // Render pagination
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const pagination = document.getElementById('pagination');
+            
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            
+            // Previous button
+            html += `
+                <button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+            `;
+            
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (
+                    i === 1 || 
+                    i === totalPages || 
+                    (i >= currentPage - 1 && i <= currentPage + 1)
+                ) {
+                    html += `
+                        <button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">
+                            ${i}
+                        </button>
+                    `;
+                } else if (
+                    i === currentPage - 2 || 
+                    i === currentPage + 2
+                ) {
+                    html += `<span class="page-btn">...</span>`;
+                }
+            }
+            
+            // Next button
+            html += `
+                <button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderInventory();
+        }
+
+        function openAddProductModal() {
+            document.getElementById('modal-title').textContent = 'Add New Product';
+            document.getElementById('product-form').reset();
+            document.getElementById('product-id').value = '';
+            
+            // Set default expiry date to 1 week from now
+            const today = new Date();
+            const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+            document.getElementById('product-expiry').value = formatDate(nextWeek);
+            
+            document.getElementById('product-modal').classList.add('show');
+        }
+
+        async function editProduct(productId) {
+            try {
+                const response = await apiCall(`/products/${productId}`);
+                
+                if (!response || !response.success) {
+                    throw new Error('Failed to load product details');
+                }
+                
+                const product = response.data;
+                
+                document.getElementById('modal-title').textContent = 'Edit Product';
+                document.getElementById('product-id').value = product._id;
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-category').value = product.category;
+                document.getElementById('product-price').value = product.price;
+                document.getElementById('product-quantity').value = product.quantity;
+                document.getElementById('product-expiry').value = formatDateForInput(product.expiryDate);
+                document.getElementById('product-description').value = product.description || '';
+                
+                document.getElementById('product-modal').classList.add('show');
+                
+            } catch (error) {
+                console.error('Error loading product details:', error);
+                alert('Failed to load product details. Please try again.');
+            }
+        }
+
+        async function saveProduct() {
+            const productId = document.getElementById('product-id').value;
+            const productData = {
+                name: document.getElementById('product-name').value,
+                category: document.getElementById('product-category').value,
+                price: parseFloat(document.getElementById('product-price').value),
+                quantity: parseInt(document.getElementById('product-quantity').value),
+                expiryDate: document.getElementById('product-expiry').value,
+                description: document.getElementById('product-description').value
+            };
+            
+            try {
+                let response;
+                
+                if (productId) {
+                    // Update existing product
+                    response = await apiCall(`/products/${productId}`, 'PUT', productData);
+                } else {
+                    // Add new product
+                    response = await apiCall('/products', 'POST', productData);
+                }
+                
+                if (!response || !response.success) {
+                    throw new Error(response.message || 'Failed to save product');
+                }
+                
+                // Close modal and reload inventory
+                closeProductModal();
+                loadInventory();
+                
+                // Show success message
+                alert(productId ? 'Product updated successfully!' : 'Product added successfully!');
+                
+            } catch (error) {
+                console.error('Error saving product:', error);
+                alert('Failed to save product: ' + error.message);
+            }
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.remove('show');
+        }
+
+        function deleteProduct(productId, productName) {
+            deleteProductId = productId;
+            document.getElementById('delete-product-name').textContent = productName;
+            document.getElementById('delete-modal').classList.add('show');
+        }
+
+        async function confirmDelete() {
+            if (!deleteProductId) return;
+            
+            try {
+                const response = await apiCall(`/products/${deleteProductId}`, 'DELETE');
+                
+                if (!response || !response.success) {
+                    throw new Error(response.message || 'Failed to delete product');
+                }
+                
+                // Close modal and reload inventory
+                closeDeleteModal();
+                loadInventory();
+                
+                // Show success message
+                alert('Product deleted successfully!');
+                
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                alert('Failed to delete product: ' + error.message);
+            }
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.remove('show');
+            deleteProductId = null;
+        }
+
+        function formatDateForInput(dateString) {
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        }
+    </script>
+</body>
+</html> 

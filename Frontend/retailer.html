@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shelf - Retailer Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-800);
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            width: 100%;
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar .brand {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .brand::before {
+            content: '🌱';
+            margin-right: 10px;
+        }
+
+        .navbar .menu {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navbar .menu a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto 40px;
+            padding: 30px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            font-size: 28px;
+            color: white;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 10px;
+        }
+
+        .card-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .card-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .positive-change {
+            color: var(--success);
+        }
+
+        .negative-change {
+            color: var(--danger);
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 18px;
+        }
+
+        .card-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .order-card {
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .order-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .order-header {
+            padding: 15px;
+            background-color: var(--primary-light);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-id {
+            font-weight: 600;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+        }
+
+        .order-date {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .order-body {
+            padding: 15px;
+        }
+
+        .order-customer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .customer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-600);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .order-items {
+            margin-bottom: 15px;
+        }
+
+        .order-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .order-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-quantity {
+            background-color: var(--primary-light);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .item-name {
+            flex: 1;
+            font-size: 14px;
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: var(--gray-900);
+            font-size: 14px;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 10px;
+            border-top: 1px solid var(--gray-200);
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .order-footer {
+            padding: 15px;
+            background-color: var(--gray-50);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .order-status {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background-color: var(--warning);
+            color: var(--gray-900);
+        }
+
+        .status-processing {
+            background-color: var(--info);
+            color: white;
+        }
+
+        .status-shipped {
+            background-color: var(--primary-light);
+            color: white;
+        }
+
+        .status-delivered {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .notification-badge {
+            position: relative;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--gray-200);
+            padding-bottom: 15px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--gray-600);
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .chart-filter {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chart-filter select {
+            padding: 8px 15px;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-300);
+            background-color: white;
+            font-size: 14px;
+            color: var(--gray-700);
+        }
+
+        .chart {
+            height: 300px;
+            width: 100%;
+            background-color: var(--gray-50);
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-500);
+            font-size: 16px;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .quick-action-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .quick-action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .quick-action-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 24px;
+            color: white;
+        }
+
+        .quick-action-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--gray-900);
+        }
+
+        .quick-action-description {
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .page-title {
+                font-size: 24px;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                white-space: nowrap;
+                padding-bottom: 5px;
+            }
+            
+            .tab {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="retailer.html" class="brand">Smart Shelf</a>
+        <div class="menu">
+            <a href="retailer.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="retailer-inventory.html"><i class="fas fa-boxes"></i> Inventory</a>
+            <a href="retailer-orders.html"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a href="retailer-products.html"><i class="fas fa-store"></i> Products</a>
+            <a href="login-signup.html" id="login-link"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="#" id="logout-link" style="display: none;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <span id="user-info" style="display: none; color: white; padding: 10px 18px; align-items: center; gap: 8px;">
+                <i class="fas fa-user"></i> <span id="user-name"></span>
+            </span>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">Retailer Dashboard</h1>
+        
+        <div id="dashboard-content">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading dashboard data...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated and has retailer role
+            if (!protectPage(['retailer'])) {
+                return;
+            }
+            
+            // Set user name in the navbar
+            const userName = localStorage.getItem('userName');
+            if (userName) {
+                document.getElementById('user-name').textContent = userName;
+            }
+            
+            // Update navigation based on authentication
+            document.getElementById('login-link').style.display = 'none';
+            document.getElementById('logout-link').style.display = 'block';
+            document.getElementById('user-info').style.display = 'flex';
+            
+            // Add logout listener
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+            
+            // Initialize dashboard
+            loadDashboardData();
+        });
+        
+        async function loadDashboardData() {
+            const dashboardContent = document.getElementById('dashboard-content');
+            
+            try {
+                // Get inventory stats
+                const inventoryResponse = await apiCall('/products/inventory/me');
+                const surplusResponse = await apiCall('/products/surplus/near-expiry');
+                
+                if (!inventoryResponse || !inventoryResponse.success) {
+                    throw new Error('Failed to load inventory data');
+                }
+                
+                const products = inventoryResponse.data || [];
+                const surplusProducts = surplusResponse.success ? surplusResponse.data : [];
+                
+                // Calculate stats
+                const totalProducts = products.length;
+                const totalValue = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+                const nearExpiryCount = surplusProducts.length;
+                const expiredCount = products.filter(p => p.status === 'expired').length;
+                
+                // Render dashboard
+                dashboardContent.innerHTML = `
+                    <div class="dashboard-widgets">
+                        <div class="widget">
+                            <div class="widget-title">Total Products</div>
+                            <div class="widget-value">${totalProducts}</div>
+                        </div>
+                        <div class="widget">
+                            <div class="widget-title">Total Inventory Value</div>
+                            <div class="widget-value">${formatCurrency(totalValue)}</div>
+                        </div>
+                        <div class="widget">
+                            <div class="widget-title">Near Expiry Items</div>
+                            <div class="widget-value">${nearExpiryCount}</div>
+                        </div>
+                        <div class="widget">
+                            <div class="widget-title">Expired Items</div>
+                            <div class="widget-value">${expiredCount}</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">Recent Inventory</div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Category</th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                            <th>Expiry Date</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${renderRecentProducts(products.slice(0, 5))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            ${products.length > 5 ? `<a href="inventory.html" class="btn">View All Inventory</a>` : ''}
+        </div>
+        </div>
+
+                    ${nearExpiryCount > 0 ? `
+                    <div class="card">
+                        <div class="card-header">Near Expiry Products</div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Category</th>
+                                            <th>Price</th>
+                                            <th>Expiry Date</th>
+                                            <th>Days Left</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${renderNearExpiryProducts(surplusProducts.slice(0, 5))}
+                                    </tbody>
+                                </table>
+        </div>
+                            ${surplusProducts.length > 5 ? `<a href="surplus_m.html" class="btn">Manage Surplus</a>` : ''}
+        </div>
+    </div>
+                    ` : ''}
+                `;
+            } catch (error) {
+                console.error('Dashboard loading error:', error);
+                dashboardContent.innerHTML = `
+                    <div class="error-container">
+                        <p>Failed to load dashboard data. Please try again.</p>
+                        <button class="btn" onclick="window.location.reload()">Reload</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function renderRecentProducts(products) {
+            if (!products || products.length === 0) {
+                return `<tr><td colspan="6" style="text-align: center;">No products found</td></tr>`;
+            }
+            
+            return products.map(product => {
+                const statusClass = product.status === 'fresh' ? 'status-fresh' : 
+                                   product.status === 'near_expiry' ? 'status-near-expiry' : 
+                                   'status-expired';
+                
+                return `
+                <tr>
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
+                    <td>${formatCurrency(product.price)}</td>
+                    <td>${product.quantity}</td>
+                    <td>${formatDate(product.expiryDate)}</td>
+                    <td><span class="status ${statusClass}">${product.status.replace('_', ' ')}</span></td>
+                </tr>
+                `;
+            }).join('');
+        }
+        
+        function renderNearExpiryProducts(products) {
+            if (!products || products.length === 0) {
+                return `<tr><td colspan="6" style="text-align: center;">No near expiry products found</td></tr>`;
+            }
+            
+            return products.map(product => {
+                const today = new Date();
+                const expiryDate = new Date(product.expiryDate);
+                const daysLeft = Math.max(0, Math.floor((expiryDate - today) / (1000 * 60 * 60 * 24)));
+                
+                return `
+                <tr>
+                    <td>${product.name}</td>
+                    <td>${product.category}</td>
+                    <td>${formatCurrency(product.price)}</td>
+                    <td>${formatDate(product.expiryDate)}</td>
+                    <td>${daysLeft}</td>
+                    <td>
+                        <a href="surplus_m.html?id=${product._id}" class="btn">Manage</a>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shelf - About Us</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-800);
+            padding-top: 80px;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(46, 125, 50, 0.8), rgba(46, 125, 50, 0.8)), 
+                url('https://cdn.wallpapersafari.com/37/91/DXHEKl.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .navbar {
+            width: 100%;
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .navbar .brand {
+            color: white;
+            font-size: 28px;
+            font-weight: 700;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar .brand::before {
+            content: '🌱';
+            margin-right: 10px;
+        }
+
+        .navbar .menu {
+            display: flex;
+            gap: 10px;
+        }
+
+        .navbar .menu a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .navbar .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 30px;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .page-header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .page-header p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .about-us-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .about-text {
+            color: white;
+            animation: slideInRight 0.8s ease;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .about-text h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .about-text h2 i {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 12px;
+            border-radius: 50%;
+            font-size: 24px;
+        }
+
+        .about-text p {
+            font-size: 17px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .about-image {
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            height: 400px;
+            box-shadow: var(--shadow-lg);
+            animation: slideInLeft 0.8s ease;
+        }
+
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .core-values {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+            animation: fadeInUp 1s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .value-card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+            transform: translateY(0);
+        }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25);
+        }
+
+        .value-icon {
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+
+        .innovation .value-icon {
+            background: linear-gradient(135deg, #3498db, #1abc9c);
+        }
+
+        .sustainability .value-icon {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+        }
+
+        .community .value-icon {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .value-content {
+            padding: 25px;
+        }
+
+        .value-content h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--gray-900);
+        }
+
+        .value-content p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--gray-700);
+        }
+
+        .team-section {
+            margin-top: 80px;
+            text-align: center;
+            color: white;
+            animation: fadeIn 1s ease;
+        }
+
+        .team-section h2 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 40px;
+        }
+
+        .team-members {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .team-member {
+            background-color: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            color: white;
+            transition: var(--transition);
+        }
+
+        .team-member:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+            background-color: rgba(255, 255, 255, 0.25);
+        }
+
+        .member-image {
+            height: 270px;
+            overflow: hidden;
+        }
+
+        .member-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .team-member:hover .member-image img {
+            transform: scale(1.1);
+        }
+
+        .member-info {
+            padding: 20px;
+        }
+
+        .member-info h3 {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .member-info p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .social-links a {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.2);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 80px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 992px) {
+            .about-us-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .about-image {
+                order: -1;
+                height: 300px;
+            }
+            
+            .core-values {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .page-header h1 {
+                font-size: 36px;
+            }
+            
+            .about-text h2 {
+                font-size: 28px;
+            }
+            
+            .team-members {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <a href="customer.html" class="brand">Smart Shelf</a>
+        <div class="menu">
+            <a href="customer.html"><i class="fas fa-home"></i> Home</a>
+            <a href="buy-products.html"><i class="fas fa-shopping-basket"></i> Products</a>
+            <a href="sale.html"><i class="fas fa-tags"></i> Sale</a>
+            <a href="about-us.html" class="active"><i class="fas fa-info-circle"></i> About Us</a>
+            <a href="login-signup.html"><i class="fas fa-user"></i> Login/Sign Up</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>About Smart Shelf</h1>
+            <p>Revolutionizing food retail with technology to reduce waste and maximize profits</p>
+        </div>
+
+        <div class="about-us-content">
+            <div class="about-text">
+                <h2><i class="fas fa-leaf"></i> Our Story</h2>
+                <p>
+                    Smart Shelf was founded with a mission to tackle the growing problem of food waste in retail. 
+                    We saw firsthand how grocery stores and food retailers struggled with managing inventory, 
+                    especially perishable goods that often ended up being discarded.
+                </p>
+                <p>
+                    Our platform leverages cutting-edge technology to help retailers track inventory, 
+                    identify items approaching their expiry dates, and take proactive measures to reduce waste 
+                    while maintaining profitability.
+                </p>
+                
+                <h2><i class="fas fa-bullseye"></i> Our Mission</h2>
+                <p>
+                    Our mission is to reduce food loss and waste across retail businesses. We believe that by harnessing 
+                    technology, retailers can make more informed decisions and help minimize the environmental impact of food 
+                    waste while improving their bottom line.
+                </p>
+                
+                <h2><i class="fas fa-eye"></i> Our Vision</h2>
+                <p>
+                    Our vision is to become the leading platform for food loss management by providing innovative solutions 
+                    that help businesses reduce waste, optimize inventory management, support local communities, and 
+                    contribute to a more sustainable food system globally.
+                </p>
+            </div>
+            
+            <div class="about-image">
+                <img src="https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80" alt="Fresh produce at a grocery store">
+            </div>
+        </div>
+
+        <div class="core-values">
+            <div class="value-card innovation">
+                <div class="value-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div class="value-content">
+                    <h3>Innovation</h3>
+                    <p>We are committed to using technology to create innovative solutions that address food loss and waste in the retail sector. We constantly explore new ways to leverage data and analytics to provide actionable insights.</p>
+                </div>
+            </div>
+            
+            <div class="value-card sustainability">
+                <div class="value-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="value-content">
+                    <h3>Sustainability</h3>
+                    <p>We prioritize sustainable practices to ensure that our platform contributes to a cleaner, greener planet. By reducing food waste, we help conserve resources and minimize greenhouse gas emissions.</p>
+                </div>
+            </div>
+            
+            <div class="value-card community">
+                <div class="value-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <div class="value-content">
+                    <h3>Community</h3>
+                    <p>We aim to empower businesses and communities by providing the tools they need to fight food loss and waste together. We facilitate connections between retailers and local food banks or charities.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="team-section">
+            <h2>Our Team</h2>
+            <div class="team-members">
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="John Doe">
+                    </div>
+                    <div class="member-info">
+                        <h3>John Doe</h3>
+                        <p>Founder & CEO</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Sarah Smith">
+                    </div>
+                    <div class="member-info">
+                        <h3>Sarah Smith</h3>
+                        <p>CTO</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Raj Patel">
+                    </div>
+                    <div class="member-info">
+                        <h3>Raj Patel</h3>
+                        <p>Product Manager</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="team-member">
+                    <div class="member-image">
+                        <img src="https://randomuser.me/api/portraits/women/17.jpg" alt="Anika Sharma">
+                    </div>
+                    <div class="member-info">
+                        <h3>Anika Sharma</h3>
+                        <p>Lead Developer</p>
+                        <div class="social-links">
+                            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="#"><i class="fab fa-twitter"></i></a>
+                            <a href="#"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Smart Shelf. All Rights Reserved.</p>
+    </footer>
+
+    <script src="js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update navigation based on authentication status
+            if (isAuthenticated()) {
+                const userRole = localStorage.getItem('userRole');
+                const loginLink = document.querySelector('.menu a[href="login-signup.html"]');
+                
+                if (loginLink) {
+                    loginLink.innerHTML = '<i class="fas fa-user"></i> Account';
+                    loginLink.href = userRole === 'retailer' ? 'retailer.html' : 'customer.html';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

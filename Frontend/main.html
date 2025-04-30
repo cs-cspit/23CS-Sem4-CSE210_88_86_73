@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Shelf - Select User</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: linear-gradient(rgba(46, 125, 50, 0.4), rgba(46, 125, 50, 0.4)), 
+                url('https://t3.ftcdn.net/jpg/09/30/89/18/360_F_930891893_uQnRJBGy8yDZ8sRJ5qH15tTsfNxeY7ET.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        .hero-section {
+            text-align: center;
+            position: absolute;
+            width: 100%;
+            top: 15%;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 56px;
+            font-weight: 700;
+            margin-bottom: 0;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 22px;
+            opacity: 0.9;
+            margin-top: 15px;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.5px;
+            animation: fadeInUp 1s ease 0.3s both;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 90%;
+            max-width: 450px;
+            position: absolute;
+            left: 5%;
+            bottom: 15%;
+            animation: fadeInUp 1s ease 0.6s both;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .container h2 {
+            margin-bottom: 30px;
+            color: white;
+            font-size: 28px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .user-option {
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            background: var(--primary);
+            padding: 16px 25px;
+            border-radius: var(--radius);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .user-option:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: var(--primary-dark);
+            transition: width 0.3s ease;
+            z-index: -1;
+        }
+
+        .user-option:hover:before {
+            width: 100%;
+        }
+
+        .user-option:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .user-option i {
+            font-size: 22px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 42px;
+            }
+            
+            .hero-subtitle {
+                font-size: 18px;
+            }
+            
+            .container {
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <h1 class="hero-title">Welcome to Smart Shelf</h1>
+        <p class="hero-subtitle">Smart shopping, sustainable living.</p>
+    </div>
+    
+    <div class="container">
+        <h2>I am a...</h2>
+        <div class="user-selection">
+            <a href="retailer.html" class="user-option">
+                <i class="fas fa-store"></i> Retailer
+            </a>
+            <a href="customer.html" class="user-option">
+                <i class="fas fa-shopping-basket"></i> Customer
+            </a>
+        </div>
+    </div>
+</body>
+</html>
