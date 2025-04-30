@@ -23,7 +23,274 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 5%;
-            position: fixed;
+            position: fixed;```javascript
+// Check if user is authenticated
+if (!localStorage.getItem('auth_token')) {
+    window.location.href = 'login-signup.html';
+    return;
+}
+
+// Update navigation based on authentication
+const userName = localStorage.getItem('userName');
+if (userName) {
+    document.getElementById('login-link').style.display = 'none';
+    document.getElementById('logout-link').style.display = 'block';
+    document.getElementById('user-name').textContent = userName;
+    document.getElementById('user-info').style.display = 'flex';
+}
+
+// Add logout listener
+document.getElementById('logout-link').addEventListener('click', function(e) {
+    e.preventDefault();
+    logout();
+});
+
+// Load orders
+loadOrders();
+
+// Function to load orders
+async function loadOrders() {
+    try {
+        const ordersContainer = document.getElementById('orders-container');
+        const emptyOrdersMsg = document.getElementById('empty-orders-msg');
+
+        // Show loading indicator
+        ordersContainer.innerHTML = `
+            <div class="loading-spinner" style="text-align: center; padding: 50px;">
+                <div class="spinner" style="margin: 0 auto;"></div>
+                <p style="margin-top: 20px;">Loading your orders...</p>
+            </div>
+        `;
+
+        // Get the correct token
+        const token = localStorage.getItem('auth_token');
+
+        if (!token) {
+            throw new Error('Authentication token not found. Please log in again.');
+        }
+
+        // Fetch orders from backend API
+        const response = await fetch('http://localhost:5000/api/orders/me', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to load orders (Status: ${response.status})`);
+        }
+
+        const result = await response.json();
+        const orders = result.data || [];
+
+        if (orders.length === 0) {
+            emptyOrdersMsg.style.display = 'block';
+            ordersContainer.innerHTML = '';
+            return;
+        }
+
+        emptyOrdersMsg.style.display = 'none';
+
+        // Sort orders by date (newest first)
+        orders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        // Generate HTML for each order
+        ordersContainer.innerHTML = orders.map((order, index) => {
+            const orderDate = new Date(order.createdAt);
+            const formattedDate = orderDate.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            const statusClass = getStatusClass(order.status);
+
+            return `
+            <div class="order-item">
+                <div class="order-header">
+                    <div class="order-id">Order #${order._id}</div>
+                    <div class="order-date">${formattedDate}</div>
+                </div>
+
+                <div class="order-status">
+                    <span class="status-badge ${statusClass}">${capitalizeFirstLetter(order.status)}</span>
+                    <span class="order-total">Total: ₹${order.totalPrice.toFixed(2)}</span>
+                </div>
+
+                <div class="order-products">
+                    <div class="product-list">
+                        ${order.orderItems.map(item => `
+                            <div class="product-card">
+                                <img src="${item.image || `https://via.placeholder.com/60x60?text=${encodeURIComponent(item.name)}`}" 
+                                    alt="${item.name}" class="product-image">
+                                <div class="product-details">
+                                    <div class="product-name">${item.name}</div>
+                                    <div class="product-info">
+                                        <span>${item.quantity} × ₹${item.price.toFixed(2)}</span>
+                                        <span>₹${(item.quantity * item.price).toFixed(2)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="order-actions">
+                    <button class="btn-order btn-outline" onclick="toggleTracking('${order._id}')">
+                        <i class="fas fa-truck"></i> Track Order
+                    </button>
+                    ${order.status === 'pending' ? `
+                        <button class="btn-order btn-danger" onclick="cancelOrder('${order._id}')">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                    ` : ''}
+                    <button class="btn-order btn-primary" onclick="reorderItems('${order._id}')">
+                        <i class="fas fa-redo"></i> Reorder
+                    </button>
+                </div>
+
+                <div id="tracking-info-${order._id}" class="tracking-info" style="display: none;">
+                    <h3><i class="fas fa-truck"></i> Tracking Information</h3>
+                    <div class="tracking-steps">
+                        <div class="step completed">
+                            <div class="step-icon"><i class="fas fa-check"></i></div>
+                            <div class="step-label">Order Placed</div>
+                        </div>
+                        <div class="step ${order.status !== 'pending' ? 'completed' : ''}">
+                            <div class="step-icon"><i class="fas fa-check"></i></div>
+                            <div class="step-label">Processing</div>
+                        </div>
+                        <div class="step ${order.status === 'shipped' || order.status === 'delivered' ? 'completed' : order.status === 'processing' ? 'active' : ''}">
+                            <div class="step-icon"><i class="fas fa-truck"></i></div>
+                            <div class="step-label">Shipped</div>
+                        </div>
+                        <div class="step ${order.status === 'delivered' ? 'completed' : order.status === 'shipped' ? 'active' : ''}">
+                            <div class="step-icon"><i class="fas fa-home"></i></div>
+                            <div class="step-label">Delivered</div>
+                        </div>
+                    </div>
+                    ${order.status === 'shipped' ? `
+                        <div style="text-align: center; margin-top: 20px;">
+                            <p>Estimated delivery: ${getEstimatedDelivery(order.createdAt)}</p>
+                            <p>Tracking Number: <strong>${order._id}</strong></p>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+            `;
+        }).join('');
+
+        // Add event listeners to show/hide tracking info
+        orders.forEach(order => {
+            const trackingInfo = document.getElementById(`tracking-info-${order._id}`);
+            if (trackingInfo) {
+                trackingInfo.style.display = 'none';
+            }
+        });
+
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        const ordersContainer = document.getElementById('orders-container');
+        ordersContainer.innerHTML = `
+            <div class="error-container" style="text-align: center; padding: 30px;">
+                <p><i class="fas fa-exclamation-circle"></i> Failed to load orders: ${error.message}</p>
+                <button class="btn-order btn-primary" onclick="loadOrders()">Try Again</button>
+            </div>
+        `;
+    }
+}
+
+// Function to toggle tracking info
+function toggleTracking(orderId) {
+    const trackingInfo = document.getElementById(`tracking-info-${orderId}`);
+    if (trackingInfo) {
+        trackingInfo.style.display = trackingInfo.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+// Function to cancel order
+async function cancelOrder(orderId) {
+    if (!confirm('Are you sure you want to cancel this order?')) {
+        return;
+    }
+
+    try {
+        // Get the correct token
+        const token = localStorage.getItem('auth_token');
+
+        if (!token) {
+            throw new Error('Authentication token not found. Please log in again.');
+        }
+
+        const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ status: 'cancelled' })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to cancel order (Status: ${response.status})`);
+        }
+
+        // Reload orders
+        loadOrders();
+
+    } catch (error) {
+        console.error('Error cancelling order:', error);
+        alert(`Failed to cancel order: ${error.message}`);
+    }
+}
+
+// Function to reorder items
+async function reorderItems(orderId) {
+    try {
+        // Get the correct token
+        const token = localStorage.getItem('auth_token');
+
+        if (!token) {
+            throw new Error('Authentication token not found. Please log in again.');
+        }
+
+        // Get order details
+        const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to get order details (Status: ${response.status})`);
+        }
+
+        const result = await response.json();
+        const order = result.data;
+
+        if (!order) {
+            throw new Error('Order not found');
+        }
+
+        // Create a cart with the order items
+        const cart = order.orderItems.map(item => ({
+            productId: item.product,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            category: item.category || 'Product',
+            image: item.image || `https://via.placeholder.com/120x120?text=${encodeURIComponent(item.name)}`
+        }));
+
+        // Save to localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // Redirect to cart page
+       
             top: 0;
             left: 0;
             z-index: 1000;
